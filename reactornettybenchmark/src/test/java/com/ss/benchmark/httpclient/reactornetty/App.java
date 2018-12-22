@@ -12,7 +12,7 @@ import java.util.concurrent.TimeUnit;
 
 public class App {
     public static void main(String[] args) throws Exception {
-        int executions = 1_000;
+        int executions = 10_000;
         // If we use a ConnectionProvider with 200, the app 'hangs' my Macbook.  If I wait long enough,
         // think_ the application will finish.
         int poolSize = 50;
