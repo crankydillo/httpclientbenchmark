@@ -53,7 +53,7 @@ public class RxNettyPerformanceTests extends BenchmarkCommon {
 
     @BeforeTest
     public void initializeTest() {
-        this.setupMetrics();
+        super.initializeTest();
 
         poolConfig = new PoolConfig().maxConnections(MAX_CONNECTION_POOL_SIZE).maxIdleTimeoutMillis(CONNECTION_TTL);
         client = HttpClient
@@ -83,7 +83,7 @@ public class RxNettyPerformanceTests extends BenchmarkCommon {
                     e.printStackTrace();
                 }
             }
-        this.tearDownMetrics();
+        super.finalizeTest();
     }
 
     public StringBuffer executeBlocking2(HttpClientRequest<ByteBuf, ByteBuf> request){
@@ -173,12 +173,6 @@ public class RxNettyPerformanceTests extends BenchmarkCommon {
             e.printStackTrace();
         }
     }
-
-    private StringBuffer executeSync() {
-
-        return null;
-    }
-
 
     @Test(priority = 1)
     public void testVanillaBlockingGET() throws Exception {

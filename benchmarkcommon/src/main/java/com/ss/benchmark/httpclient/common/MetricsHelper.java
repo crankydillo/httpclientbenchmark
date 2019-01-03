@@ -18,7 +18,7 @@ public class MetricsHelper {
 
     public void initializeMetrics() {
         reporter = ConsoleReporter.forRegistry(metricRegistry).convertDurationsTo(TimeUnit.MILLISECONDS).build();
-        reporter.start(1, TimeUnit.HOURS);
+        reporter.start(30, TimeUnit.SECONDS);
     }
 
     public Meter getRateMeter(String name, String method){

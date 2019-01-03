@@ -49,13 +49,12 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
 
     @BeforeTest
     public void initializeTest() {
-        setupMetrics();
+        super.initializeTest();
         reactorNettyClient = setupReactorNettyHttpClient(this.getBaseUrl());
     }
 
-    // TODO : use atomic interger rather than int in async execute
     @AfterTest
-    public void finalizeTest(){
+    public void finalizeTest() {
         for (CountDownLatch latcher : latches) {
             try {
                 latcher.await();
@@ -63,8 +62,9 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                 e.printStackTrace();
             }
         }
-        tearDownMetrics();
+        super.finalizeTest();
     }
+
 
     @Test(invocationCount = MAX_CONNECTION_POOL_SIZE, threadPoolSize = MAX_CONNECTION_POOL_SIZE, priority = 0)
     public void warmupBlocking() {
@@ -79,8 +79,7 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
 
         Timer.Context ctx = timer.time();
         try {
-            String result = executeSync(requestSender);
-//            assertEquals(result, BenchmarkCommon.RANDOM_ECHO_RESPONSE);
+            executeSync(requestSender);
             ctx.stop();
         } catch(Exception ex) {
             ctx.stop();
@@ -91,7 +90,6 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
 
     @Test(priority = 1)
     public void testVanillaBlockingGET() throws Exception {
-        logger.info("Start testVanillaBlockingGET");
         CountDownLatch latch = new CountDownLatch(1);
 
         Mono<String> responseVerifier = reactorNettyClient
@@ -105,7 +103,6 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                 .create(responseVerifier)
                 .assertNext(s -> assertEquals(s, Payloads.SHORT_JSON ))
                 .verifyComplete();
-        logger.info("Completed testVanillaBlockingGET");
     }
 
     @Test(priority = 2)
@@ -166,8 +163,7 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
             HttpClient.RequestSender requestSender = reactorNettyClient
                     .request(HttpMethod.GET)
                     .uri(echoURL(uuid));
-            executeAsync(requestSender, timer, errors, latcher, i)
-                    .subscribe(s -> {});
+            executeAsyncAndDiscard(requestSender, timer, errors, latcher, i);
         }
         try {
             latcher.await();
@@ -214,13 +210,13 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                 .request(HttpMethod.GET)
                 .uri(echoURL(uuid));
 
-        executeAsync(
+        executeAsyncAndDiscard(
                 requestSender,
                 timer,
                 errors,
                 testMultiThreadedNonBlockingGETLatch,
                 count.getAndIncrement()
-        ).subscribe(message -> {});
+        );
     }
 
     @Test(invocationCount = EXECUTIONS, threadPoolSize = 100, priority = 6)
@@ -272,7 +268,7 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                     .post()
                     .uri(ECHO_DELAY_POST_SHORT_URL)
                     .send(ByteBufFlux.fromString(Flux.just(Payloads.SHORT_JSON)));
-            executeAsync(requestSender, timer, errors, latcher, i).subscribe();
+            executeAsyncAndDiscard(requestSender, timer, errors, latcher, i);
         }
         try {
             latcher.await();
@@ -287,11 +283,12 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
         Timer timer = getTimingTimer(this.getClass(), "testNonBlockingShortLongPOST");
         Counter errors = getErrorCounter(this.getClass(), "testNonBlockingShortLongPOST");
         for (int i = 0; i < EXECUTIONS; i++){
+            final int ctr  = i;
             HttpClient.ResponseReceiver<?> requestSender = reactorNettyClient
                     .post()
                     .uri(ECHO_DELAY_POST_LONG_URL)
                     .send(ByteBufFlux.fromString(Flux.just(Payloads.SHORT_JSON)));
-            executeAsync(requestSender, timer, errors, latcher, i).subscribe();
+            executeAsyncAndDiscard(requestSender, timer, errors, latcher, i);
         }
         try {
             latcher.await();
@@ -310,7 +307,7 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                     .post()
                     .uri(ECHO_DELAY_POST_SHORT_URL)
                     .send(ByteBufFlux.fromString(Flux.just(Payloads.LONG_JSON)));
-            executeAsync(requestSender, timer, errors, latcher, i).subscribe();
+            executeAsyncAndDiscard(requestSender, timer, errors, latcher, i);
         }
         try {
             latcher.await();
@@ -325,11 +322,12 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
         Timer timer = getTimingTimer(this.getClass(), "testNonBlockingLongLongPOST");
         Counter errors = getErrorCounter(this.getClass(), "testNonBlockingLongLongPOST");
         for (int i = 0; i < EXECUTIONS; i++){
+            final int ctr = i;
             HttpClient.ResponseReceiver<?> requestSender = reactorNettyClient
                     .post()
                     .uri(ECHO_DELAY_POST_LONG_URL)
                     .send(ByteBufFlux.fromString(Mono.just(Payloads.LONG_JSON)));
-            executeAsync(requestSender, timer, errors, latcher, i).subscribe();
+            executeAsyncAndDiscard(requestSender, timer, errors, latcher, i);
         }
         try {
             latcher.await();
@@ -348,6 +346,16 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
                 })
                 .map(byteBuf -> byteBuf.toString(StandardCharsets.UTF_8))
                 .block();
+    }
+
+    public void executeAsyncAndDiscard(
+            final HttpClient.ResponseReceiver<?> request,
+            final Timer timer,
+            final Counter errors,
+            final CountDownLatch latch,
+            final int counter
+    ) {
+        executeAsync(request, timer, errors, latch, counter).subscribe(s -> {});
     }
 
     public Mono<String> executeAsync(
@@ -381,7 +389,7 @@ public class ReactorNettyHCPerformanceTests extends BenchmarkCommon {
     }
 
     // accepts a baseUrl as input and returns an instance of HttpClient
-    private HttpClient setupReactorNettyHttpClient(String baseUrl) {
+    private static HttpClient setupReactorNettyHttpClient(String baseUrl) {
         return HttpClient
                 .create(ConnectionProvider.fixed("benchmark", MAX_CONNECTION_POOL_SIZE, CONNECTION_REQUEST_TIMEOUT))
                 .baseUrl(baseUrl)

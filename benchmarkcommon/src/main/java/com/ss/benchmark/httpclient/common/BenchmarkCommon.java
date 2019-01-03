@@ -1,5 +1,8 @@
 package com.ss.benchmark.httpclient.common;
 
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeTest;
+
 /**
  * Created by ssrinivasa on 12/13/18.
  */
@@ -13,21 +16,31 @@ public class BenchmarkCommon extends MetricsHelper {
 
     //All times are milliseconds unless otherwise noted
     public static final int MAX_CONNECTION_POOL_SIZE = 200;
-    public static final int CONNECTION_TTL = 60000;
+    public static final int CONNECTION_TTL = 60_000;
     public static final int CONNECT_TIMEOUT = 500;
-    public static final int CONNECTION_REQUEST_TIMEOUT = 2000;
-    public static final int READ_TIMEOUT = 2000;
+    public static final int CONNECTION_REQUEST_TIMEOUT = 2_000;
+    public static final int READ_TIMEOUT = 2_000;
 
-    public static final int MIN_CONNECTION_POOL_SIZE = 100;
-    public static final int MAX_CONNECTION_PER_ROUTE = 200;
-    public static final int REQUEST_TIMEOUT = 2000;
-    public static final int SOCKET_TIMEOUT = 2000;
+    protected static final int EXECUTIONS = 10_000;
 
-    protected static final int EXECUTIONS = 10000;
+    @BeforeTest
+    public void initializeTest() {
+        initializeMetrics();
+    }
 
-    protected void setupMetrics() {this.initializeMetrics();}
-    protected void tearDownMetrics() {dumpMetrics(); closeMetrics();}
-    protected String echoURL(String echophrase){return BenchmarkCommon.ECHO_DELAY_BASE_URL + "/" + echophrase;}
-    protected String getBaseUrl() { return "http://localhost:8080";}
+    // TODO : use atomic interger rather than int in async execute
+    @AfterTest
+    public void finalizeTest(){
+        dumpMetrics();
+        closeMetrics();
+    }
+
+    protected String echoURL(String echophrase) {
+        return BenchmarkCommon.ECHO_DELAY_BASE_URL + "/" + echophrase;
+    }
+
+    protected String getBaseUrl() {
+        return "http://localhost:8080";
+    }
 
 }
