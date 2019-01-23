@@ -44,6 +44,13 @@ On mac (i.e. where you can't do `--net=host`):
 docker run --name flaky-server --cap-add=NET_ADMIN --rm -ti -p 8080:8080 -p 6660:6660 crankydillo/flaky-server
 ```
 
+## WARNING
+
+Even those this is docker, I had some issues with the saboteur commands.  I
+tried all kinds of ubuntu flavors to no avail.  While I haven't tried every
+command, I haven't experienced similar issues when running the container on a
+[GCP](https://cloud.google.com/compute/)-powered Ubuntu instance.
+
 # Building
 
 Assuming you have built at the root, which builds the required `mock-application`.
