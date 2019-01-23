@@ -44,6 +44,23 @@ On mac (i.e. where you can't do `--net=host`):
 docker run --name flaky-server --cap-add=NET_ADMIN --rm -ti -p 8080:8080 -p 6660:6660 crankydillo/flaky-server
 ```
 
+## Example of sabotaging the server
+
+```sh
+curl _host_:8080/short
+curl -X POST -d '{ "name": "crash", "type": "NETWORK_FAILURE", "direction": "IN", "to_port": 8080 }' _host_:6660
+curl _host_:8080/short
+curl -X DELETE _host_:6660
+curl _host_:8080/short
+```
+
+What should happen:
+1. You should see a bunch of 'a' characters.
+1. You should see '{}' and the server's behavior is modified.
+1. You should get a timeout complaining about connection failure.
+1. See nothing (probably a 200 status), but server's behavior is modified.
+1. Same as step 1.
+
 ## WARNING
 
 Even those this is docker, I had some issues with the saboteur commands.  I
