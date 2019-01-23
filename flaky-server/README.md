@@ -29,12 +29,23 @@ strategy are:
 1. Start a long-running stream of requests
 1. Periodically submit server-modifying behavior requests (e.g. add a delay)
 
-## Changes to current (internal) strategy
+#### Possible changes to current (internal) strategy
 
 I haven't identified a need for TestNG.  I'm still considering if it's best to
 have a long running stream of requests, or if we should have a
 (modify-server-behavior -> submit-requests) loop.  Regardless, I would start
 with the existing code without TestNG (unless a reason for that is found).
+
+#### Half-closed connections
+
+We are especially interested in correct pool management when the server severs
+the connection without following HTTP's negotiation rules (See the `8.1.2.1
+Negotiation` of [HTTP 1.1
+protocol](https://www.w3.org/Protocols/rfc2616/rfc2616-sec8.html).  I believe
+this can be mimicked with saboteur's NETWORK_FAILURE command and setting client
+connection pool size to 1.  I don't know if the current tests target this
+scenario.  This _may_ be the first case where it you could justify using
+TestNG.
 
 # Usage
 
