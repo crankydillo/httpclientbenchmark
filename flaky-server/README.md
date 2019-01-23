@@ -33,8 +33,16 @@ strategy are:
 
 I haven't identified a need for TestNG.  I'm still considering if it's best to
 have a long running stream of requests, or if we should have a
-(modify-server-behavior -> submit-requests) loop.  Regardless, I would start
-with the existing code without TestNG (unless a reason for that is found).
+(modify-server-behavior -> submit-requests) loop.
+
+Regardless, I would start with the existing code without TestNG (unless a
+reason for that is found).
+
+##### A case for TestNG
+
+_If_ we can find a way to house the server changes into testXyz methods (e.g.
+`testWhenPacketLoss50%`), I think you could make a case for TestNG.  We did
+something similar in the performance tests using `@DataProvider`.
 
 #### Half-closed connections
 
