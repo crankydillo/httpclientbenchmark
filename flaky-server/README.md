@@ -2,6 +2,14 @@
 
 Used for HTTP client resiliency tests.
 
+## WARNING
+
+I had some issues with the saboteur commands when the Docker container is
+running on my Mac.  I tried many of Ubuntu image bases (12 -> 18) to no avail.
+While I haven't tried every command, I haven't experienced similar issues when
+running the container on a [GCP](https://cloud.google.com/compute/)-powered
+Ubuntu instance.
+
 # Idea
 
 ## Start a 'flaky' server
@@ -12,13 +20,6 @@ the behavior of the server (inject delays, packet loss, etc.).
 
 The 'normal' application is built from the `mock-application` module.  The
 other application is [saboteur](https://github.com/tomakehurst/saboteur).
-
-I have been trying to build this server as a docker application; however, that
-may not be feasible.  I don't know if it's docker and/or saboteur, but I
-haven't been able to get it fully working.  Even so, I'd still spend a bit more
-time using the docker route.  I'd also search for some newer alternatives to
-`saboteur`, which is both old and doesn't appear to be hugely popular (based on
-github stars).
 
 ## Run resiliency test
 
@@ -79,13 +80,6 @@ What should happen:
 1. You should get a timeout complaining about connection failure.
 1. See nothing (probably a 200 status), but server's behavior is modified.
 1. Same as step 1.
-
-## WARNING
-
-Even those this is docker, I had some issues with the saboteur commands.  I
-tried all kinds of ubuntu flavors to no avail.  While I haven't tried every
-command, I haven't experienced similar issues when running the container on a
-[GCP](https://cloud.google.com/compute/)-powered Ubuntu instance.
 
 # Building
 
