@@ -47,11 +47,11 @@ docker run --name flaky-server --cap-add=NET_ADMIN --rm -ti -p 8080:8080 -p 6660
 ## Example of sabotaging the server
 
 ```sh
-curl _host_:8080/short
-curl -X POST -d '{ "name": "crash", "type": "NETWORK_FAILURE", "direction": "IN", "to_port": 8080 }' _host_:6660
-curl _host_:8080/short
-curl -X DELETE _host_:6660
-curl _host_:8080/short
+curl $HOST:8080/short
+curl -X POST -d '{ "name": "crash", "type": "NETWORK_FAILURE", "direction": "IN", "to_port": 8080 }' $HOST:6660
+curl $HOST:8080/short
+curl -X DELETE $HOST:6660
+curl $HOST:8080/short
 ```
 
 What should happen:
