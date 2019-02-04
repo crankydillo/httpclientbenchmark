@@ -98,7 +98,6 @@ public abstract class BaseChaosTest extends MetricsGatheringTest {
         FixedRateRunner chaosInjector = FixedRateRunner.create(1, 1.0 / 10.0, chaosTask);
         LOG.info("Starting chaos");
         chaosInjector.start();
-        LOG.info("Starting exercise");
         exercise(method);
         LOG.info("Stopping chaos");
         chaosInjector.stop();
@@ -176,6 +175,7 @@ public abstract class BaseChaosTest extends MetricsGatheringTest {
             taskCounter.register();
         };
 
+        LOG.info("Starting exercise");
         FixedRateRunner runner = FixedRateRunner.create(10, 50, taskThatNeedsToBeCompleted);
         runner.start();
         CountDownLatch latch = new CountDownLatch(1);
