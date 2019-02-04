@@ -16,17 +16,10 @@
     </properties>
 
     <modules>
-        <module>benchmark-common</module>
-        <module>mock-application</module>
-        <module>reactornetty-benchmark</module>
-        <module>rxnetty-benchmark</module>
-        <module>apacheasync-benchmark</module>
-        <module>apachesync-benchmark</module>
-        <module>asynchttpclient-benchmark</module>
-        <module>springwebclient-benchmark</module>
-        <module>gatling-stress</module>
-        <module>docker-app</module>
-        <module>reporter</module>
+        <module>libraries</module>
+        <module>servers</module>
+        <module>benchmarks</module>
+        <module>utilities</module>
     </modules>
 
     <dependencyManagement>
@@ -77,40 +70,75 @@
         </plugins>
     </build>
     <profiles>
-    <profile>
-        <id>performance</id>
-        <build>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M2</version>
-                    <executions>
-                        <execution>
-                            <id>performance-tests</id>
-                            <goals>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
-                            </goals>
-                            <configuration>
-                                <testSourceDirectory>${basedir}/src/main/java/</testSourceDirectory>
-                                <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
-                                <includes>
-                                    <include>**/*.java</include>
-                                </includes>
-                                <groups>performance</groups>
-                                <properties>
-                                    <property>
-                                        <name>listener</name>
-                                        <value>com.ss.benchmark.httpclient.common.Transformer</value>
-                                    </property>
-                                </properties>
-                            </configuration>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </build>
-    </profile>
+        <profile>
+            <id>performance</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>3.0.0-M2</version>
+                        <executions>
+                            <execution>
+                                <id>performance-tests</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <testSourceDirectory>${basedir}/src/main/java/</testSourceDirectory>
+                                    <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
+                                    <includes>
+                                        <include>**/*.java</include>
+                                    </includes>
+                                    <groups>performance</groups>
+                                    <properties>
+                                        <property>
+                                            <name>listener</name>
+                                            <value>com.ss.benchmark.httpclient.common.Transformer</value>
+                                        </property>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>chaos</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <version>3.0.0-M2</version>
+                        <executions>
+                            <execution>
+                                <id>chaos-tests</id>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                                <configuration>
+                                    <testSourceDirectory>${basedir}/src/main/java/</testSourceDirectory>
+                                    <testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
+                                    <includes>
+                                        <include>**/*.java</include>
+                                    </includes>
+                                    <groups>chaos</groups>
+                                    <properties>
+                                        <property>
+                                            <name>listener</name>
+                                            <value>com.ss.benchmark.httpclient.common.Transformer</value>
+                                        </property>
+                                    </properties>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
